@@ -1,4 +1,12 @@
 package tss.repositories;
 
-public interface ProgramRepository {
+import org.springframework.data.repository.CrudRepository;
+import tss.entities.ProgramEntity;
+
+/**
+ * Author @zengzx
+ */
+
+public interface ProgramRepository extends CrudRepository<ProgramEntity, Short> {
+
 }
