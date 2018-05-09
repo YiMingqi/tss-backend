@@ -31,10 +31,19 @@ public class ProgramCourseEntity {
     @JoinColumn(name = "program_id")
     private ProgramEntity program;
 
+    public ProgramEntity getProgram() {return program;}
+
+    public void setProgram(ProgramEntity program) {
+        this.program = program;
+    }
+
     @ManyToOne
     @JoinColumn(name = "course_id")
     private CourseEntity course;
 
+    public CourseEntity getCourse() {return course;}
 
-
+    public void setCourse(CourseEntity course) {
+        this.course = course;
+    }
 }
