@@ -7,15 +7,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
-import tss.entities.*;
-import tss.repositories.*;
+import tss.entities.ClassEntity;
+import tss.entities.CourseEntity;
+import tss.entities.UserEntity;
+import tss.exceptions.ClazzNotFoundException;
+import tss.repositories.ClassRepository;
+import tss.repositories.CourseRepository;
 import tss.requests.information.AddClassRequest;
 import tss.requests.information.DeleteClassesRequest;
 import tss.requests.information.GetInstructorsRequest;
 import tss.requests.information.ModifyClassRequest;
 import tss.responses.information.AddClassResponse;
 import tss.responses.information.DeleteClassesResponse;
-import tss.responses.information.GetInstructorsResponse;
+import tss.responses.information.GetInstructorResponse;
 import tss.responses.information.ModifyClassResponse;
 
 import java.util.ArrayList;
@@ -26,19 +30,11 @@ import java.util.Optional;
 @RequestMapping(path = "/class")
 public class ClassController {
     private final CourseRepository courseRepository;
-    private final TeachesRepository teachesRepository;
-    private final UserRepository userRepository;
-    private final TakesRepository takesRepository;
     private final ClassRepository classRepository;
 
     @Autowired
-    public ClassController(CourseRepository courseRepository, TeachesRepository teachesRepository,
-                           UserRepository userRepository, TakesRepository takesRepository,
-                           ClassRepository classRepository) {
+    public ClassController(CourseRepository courseRepository, ClassRepository classRepository) {
         this.courseRepository = courseRepository;
-        this.teachesRepository = teachesRepository;
-        this.userRepository = userRepository;
-        this.takesRepository = takesRepository;
         this.classRepository = classRepository;
     }
 
@@ -114,35 +110,14 @@ public class ClassController {
         return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/getInstructors")
+    @PostMapping(path = "/getInstructor")
     @Authorization
-    public ResponseEntity<GetInstructorsResponse> getInstructors(@RequestBody GetInstructorsRequest request) {
+    public ResponseEntity<GetInstructorResponse> getInstructor(@RequestBody GetInstructorsRequest request) {
+        ClassEntity classEntity = classRepository.findById(request.getCid()).orElseThrow(ClazzNotFoundException::new);
+        UserEntity teacherEntity = classEntity.getTeacher();
 
-        Optional<ClassEntity> ret = classRepository.findById(request.getCid());
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetInstructorsResponse("class non-exist", null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-        ClassEntity clazz = ret.get();
-        List<String> tids = new ArrayList<>();
-        List<String> names = new ArrayList<>();
-        List<List<String>> times = new ArrayList<>();
-        List<List<String>> classrooms = new ArrayList<>();
-        for (TeachesEntity teaches : clazz.getTeaches()) {
-            UserEntity teacher = teaches.getTeacher();
-            tids.add(teacher.getUid());
-            names.add(teacher.getName());
-            List<String> time = new ArrayList<>();
-            List<String> location = new ArrayList<>();
-            for (SectionEntity section : clazz.getSections()) {
-                TimeSlotEntity timeSlot = section.getTimeSlot();
-                ClassroomEntity classroom = section.getClassroom();
-                time.add(timeSlot.getDay() + " " + timeSlot.getStart() + "-" + timeSlot.getEnd());
-                times.add(time);
-                location.add(classroom.getBuilding() + " " + classroom.getRoom());
-                classrooms.add(location);
-            }
-        }
-        return new ResponseEntity<>(new GetInstructorsResponse("ok", tids, names, times, classrooms), HttpStatus.OK);
+        return new ResponseEntity<>(new GetInstructorResponse("ok", teacherEntity.getUid(), teacherEntity.getName()),
+                HttpStatus.OK);
     }
 
     /*@PutMapping(path = "/instructor")
