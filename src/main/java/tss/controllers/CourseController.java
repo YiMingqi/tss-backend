@@ -52,14 +52,14 @@ public class CourseController {
             dept = ret.get();
         }
         CourseEntity course = new CourseEntity();
-        course.setCid(request.getCid());
+        course.setId(request.getCid());
         course.setName(request.getName());
         course.setCredit(request.getCredit());
-        course.setSemester(request.getSemester());
+        course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());
         course.setDepartment(dept);
         courseRepository.save(course);
 
-        return new ResponseEntity<>(new AddCourseResponse("ok", course.getCid(), course.getName()), HttpStatus.CREATED);
+        return new ResponseEntity<>(new AddCourseResponse("ok", course.getId(), course.getName()), HttpStatus.CREATED);
 
     }
 
@@ -109,8 +109,8 @@ public class CourseController {
         if(request.getCredit() != null) {
             course.setCredit(request.getCredit());
         }
-        if(request.getSemester() != null) {
-            course.setSemester(request.getSemester());
+        if(request.getNumLessonsEachWeek() != null) {
+            course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());
         }
         if(request.getIntro() != null) {
             course.setIntro(request.getIntro());
@@ -129,8 +129,8 @@ public class CourseController {
                     null, ""), HttpStatus.BAD_REQUEST);
         }
         CourseEntity course = ret.get();
-        return new ResponseEntity<>(new GetCourseResponse("ok", course.getCid(), course.getName(),
-                course.getCredit(), course.getSemester(), course.getIntro()), HttpStatus.OK);
+        return new ResponseEntity<>(new GetCourseResponse("ok", course.getId(), course.getName(),
+                course.getCredit(), course.getNumLessonsEachWeek(), course.getIntro()), HttpStatus.OK);
     }
 
     @PostMapping(path = "/name")
@@ -139,7 +139,7 @@ public class CourseController {
         List<String> cids = new ArrayList<>();
         List<CourseEntity> ret = courseRepository.findByName(request.getName());
         for(CourseEntity user : ret) {
-            cids.add(user.getCid());
+            cids.add(user.getId());
         }
         return new ResponseEntity<>(new GetCoursesByNameResponse("OK", cids), HttpStatus.OK);
     }

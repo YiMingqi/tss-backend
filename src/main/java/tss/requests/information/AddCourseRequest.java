@@ -4,7 +4,7 @@ public class AddCourseRequest {
     private String cid;
     private String name;
     private Float credit;
-    private String semester;
+    private Integer numLessonsEachWeek;
     private String dept;
 
     public String getCid() {
@@ -31,12 +31,12 @@ public class AddCourseRequest {
         this.credit = credit;
     }
 
-    public String getSemester() {
-        return semester;
+    public Integer getNumLessonsEachWeek() {
+        return numLessonsEachWeek;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
+    public void setNumLessonsEachWeek(Integer numLessonsEachWeek) {
+        this.numLessonsEachWeek = numLessonsEachWeek;
     }
 
     public String getDept() {
