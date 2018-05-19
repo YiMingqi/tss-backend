@@ -1,8 +1,10 @@
 package tss.requests.information;
 
+import org.jetbrains.annotations.NotNull;
 
-public class GetUserByUidRequest {
-    private String uid;
+public class BasicUserRequest {
+    @NotNull
+    String uid;
 
     public String getUid() {
         return uid;
