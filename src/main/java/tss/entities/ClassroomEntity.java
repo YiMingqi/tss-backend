@@ -1,86 +1,79 @@
 package tss.entities;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-/**
- * @author reeve
- */
 @Entity
 @Table(name = "classroom")
 public class ClassroomEntity {
+    Short id;
+    private String building;
+    private Integer room;
+    private Integer capactity;
+    private Set<SectionEntity> sections = new HashSet<>();
 
     @Id
-    @GeneratedValue
-    private Integer id;
-
-    @Column(length = 32, nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private Integer capacity;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "building_id")
-    private BuildingEntity building;
-
-    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ArrangementEntity> arrangements = new ArrayList<>();
-
-    public ClassroomEntity() {
-    }
-
-    public ClassroomEntity(String name, Integer capacity, BuildingEntity building) {
-        this.name = name;
-        this.capacity = capacity;
-        this.building = building;
-    }
-
-
-    // Getter and setter.
-
-    public Integer getId() {
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Short getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Short id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public BuildingEntity getBuilding() {
+    @Column(length = 31)
+    public String getBuilding() {
         return building;
     }
 
-    public void setBuilding(BuildingEntity building) {
+    public void setBuilding(String building) {
         this.building = building;
     }
 
-    public List<ArrangementEntity> getArrangements() {
-        return arrangements;
+    @Column(nullable = false)
+    public Integer getRoom() {
+        return room;
     }
 
+    public void setRoom(Integer room) {
+        this.room = room;
+    }
 
-    // Utility methods.
+    @Column(nullable = false)
+    public Integer getCapactity() {
+        return capactity;
+    }
 
-    public void addArrangement(ArrangementEntity arrangementEntity) {
-        arrangements.add(arrangementEntity);
-        arrangementEntity.setClassroom(this);
+    public void setCapactity(Integer capactity) {
+        this.capactity = capactity;
+    }
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "classroom")
+    public Set<SectionEntity> getSections() {
+        return sections;
+    }
+
+    public void setSections(Set<SectionEntity> sections) {
+        this.sections = sections;
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return super.hashCode();
+        } else {
+            return id.hashCode();
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass()) || id == null) {
+            return false;
+        } else {
+            return (id.equals(((ClassroomEntity) obj).id));
+        }
     }
 }

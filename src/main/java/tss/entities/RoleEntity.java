@@ -1,35 +1,30 @@
 package tss.entities;
 
-import tss.entities.UserEntity;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(
-        name = "role",
-        indexes = {
-                @Index(name = "role_name_index", columnList = "role_name")
-        }
-)
+@Table(name = "role", indexes = {
+        @Index(name = "role_name_index", columnList = "role_name", unique = true)
+})
 public class RoleEntity {
-    private short id;
+    private Short id;
     private String name;
     private Set<AuthorityEntity> authorities = new HashSet<>();
-    private Set<UserEntity> users = new HashSet<>();
+    private TypeGroupEntity typeGroup;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public short getId() {
+    public Short getId() {
         return id;
     }
 
-    public void setId(short id) {
+    public void setId(Short id) {
         this.id = id;
     }
 
-    @Column(name = "role_name", length = 15, nullable = false)
+    @Column(name = "role_name", length = 31, nullable = false)
     public String getName() {
         return name;
     }
@@ -38,7 +33,7 @@ public class RoleEntity {
         this.name = name;
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "role_authority", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
     public Set<AuthorityEntity> getAuthorities() {
         return authorities;
@@ -48,12 +43,31 @@ public class RoleEntity {
         this.authorities = authorities;
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "roles")
-    public Set<UserEntity> getUsers() {
-        return users;
+    public void addAuthority(AuthorityEntity authority) {
+        authorities.add(authority);
     }
 
-    public void setUsers(Set<UserEntity> users) {
-        this.users = users;
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "group_id")
+    public TypeGroupEntity getTypeGroup() {
+        return typeGroup;
+    }
+
+    public void setTypeGroup(TypeGroupEntity typeGroup) {
+        this.typeGroup = typeGroup;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (name.equals(((RoleEntity) obj).name));
+        }
     }
 }
